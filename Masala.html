@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masala Mandir - Abarrotes Hindúes en Aguascalientes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Custom Styles & Color Palette */
+        :root {
+            --primary-saffron: #FF9933; /* Saffron Orange */
+            --primary-green: #138808;  /* India Green */
+            --accent-gold: #FFD700;    /* Gold/Marigold */
+            --text-dark: #4A4A4A;
+            --text-light: #FFFFFF;
+            --bg-light: #FFF8F0; /* Light creamy background */
+            --bg-footer: #e0e0e0;
+            --border-color: #d1d1d1;
+            --category-bg: #ffffff;
+            --category-hover-bg: #f1f1f1;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-green); border-radius: 4px;}
+        ::-webkit-scrollbar-thumb:hover { background: #0a5c04; }
+
+        /* Logo Style */
+        .logo-text {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: var(--primary-green);
+            letter-spacing: -1px;
+        }
+        .logo-text .mandir {
+            color: var(--primary-saffron);
+        }
+
+        /* Header Styling */
+        .header {
+            background-color: var(--text-light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .flag-icon {
+            width: 20px;
+            height: auto;
+            margin-left: 8px;
+            vertical-align: middle;
+            border: 1px solid #ccc;
+        }
+
+        /* Hero Section Styling */
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') no-repeat center center;
+            background-size: cover;
+            color: var(--text-light);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Featured Product Section */
+        .featured-product {
+            background-color: var(--text-light);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .featured-product img {
+            max-height: 300px; /* Limit image height */
+            object-fit: cover;
+        }
+
+        /* Category Section */
+        .category-card {
+            background-color: var(--category-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .category-card:hover {
+            background-color: var(--category-hover-bg);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: var(--primary-green);
+        }
+
+        /* Carousel Styling */
+        .carousel-container {
+            position: relative;
+            padding: 0 40px;
+        }
+        .carousel {
+            display: flex;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            gap: 1rem;
+            padding-bottom: 1rem;
+        }
+        .carousel-item {
+            flex: 0 0 auto;
+            width: 180px;
+            transition: transform 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .carousel-item:hover {
+            transform: translateY(-5px);
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .carousel-btn:hover { background-color: var(--text-light); }
+        .carousel-btn.prev { left: 0px; }
+        .carousel-btn.next { right: 0px; }
+
+        /* Typical Dishes Section - Smaller Style */
+        .dishes-section {
+            background-color: transparent;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 2rem;
+        }
+        .dish-card-small {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .dish-card-small img {
+             height: 100px;
+             width: 100%;
+             object-fit: cover;
+        }
+        .dish-name-small {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            color: var(--text-light);
+            padding: 8px 5px 4px 5px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Modal Transitions */
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        .scale-enter-active, .scale-leave-active { transition: transform 0.3s ease, opacity 0.3s ease; }
+        .scale-enter-from, .scale-leave-to { opacity: 0; transform: scale(0.95); }
+
+        /* Footer Styling */
+        .footer {
+            background-color: var(--bg-footer);
+            color: var(--text-dark);
+            border-top: 3px solid var(--primary-saffron);
+        }
+        .footer a:hover { color: var(--primary-green); }
+        .footer .fab, .footer .payment-icon { font-size: 1.5rem; margin: 0 0.5rem; vertical-align: middle; }
+        .footer .fab.fa-cc-visa { color: #1a1f71; }
+        .footer .fab.fa-cc-mastercard { color: #eb001b; }
+        .footer .fab.fa-cc-discover { color: #ff6600; }
+        .footer .payment-icon.mercado-pago {
+            font-size: 1.1rem; font-weight: bold; color: #009ee3; border: 1px solid #009ee3;
+            padding: 2px 4px; border-radius: 3px; display: inline-block; line-height: 1;
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="flex flex-col min-h-screen">
+
+        <header class="header sticky top-0 z-30 w-full px-6 py-3">
+            <div class="container mx-auto flex justify-between items-center">
+                 <div class="logo-text"> Masala<span class="mandir">Mandir</span> </div>
+                <nav class="flex items-center space-x-3 md:space-x-5">
+                    <button @click="openModal('about')" class="text-sm md:text-base hover:text-[var(--primary-saffron)] transition-colors">{{ uiStrings.aboutUs }}</button>
+                    <button @click="openModal('location')" class="text-sm md:text-base hover:text-[var(--primary-saffron)] transition-colors">{{ uiStrings.location }}</button>
+                    <button @click="toggleLanguage" class="text-sm md:text-base border border-[var(--primary-green)] px-2 py-1 rounded hover:bg-[var(--primary-green)] hover:text-white transition-colors">
+                        {{ currentLanguage === 'es' ? 'EN' : 'ES' }}
+                    </button>
+                    <div class="flex items-center">
+                        <img src="https://flagcdn.com/w40/mx.png" alt="Bandera de México" class="flag-icon">
+                        <img src="https://flagcdn.com/w40/in.png" alt="Bandera de India" class="flag-icon">
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main class="flex-grow">
+            <section class="hero-section h-64 md:h-80 flex flex-col justify-center items-center text-center p-6">
+                <h1 class="text-3xl md:text-5xl font-bold mb-3">{{ uiStrings.heroTitle }}</h1>
+                <p class="text-lg md:text-xl max-w-2xl">{{ uiStrings.heroSubtitle }}</p>
+            </section>
+
+            <section class="featured-product py-10 px-4 md:px-8">
+                <div class="container mx-auto">
+                    <h2 class="text-2xl md:text-3xl font-semibold text-center mb-6">{{ uiStrings.featuredProductTitle }}</h2>
+                    <div class="flex flex-col md:flex-row items-center gap-6 md:gap-10 bg-gradient-to-r from-orange-50 via-amber-50 to-lime-50 p-6 rounded-lg shadow-sm border border-[var(--border-color)]">
+                         <img :src="featuredProduct.imageUrl" :alt="featuredProduct.name[currentLanguage]" class="w-full md:w-1/3 rounded-lg shadow-md border border-[var(--border-color)]">
+                         <div class="md:w-2/3 text-center md:text-left">
+                             <h3 class="text-xl md:text-2xl font-bold text-[var(--primary-green)] mb-2">{{ featuredProduct.name[currentLanguage] }}</h3>
+                             <p class="text-gray-600 mb-4">{{ featuredProduct.description[currentLanguage] }}</p>
+                             <button @click="openModal('product', featuredProduct.productData)" class="bg-[var(--primary-saffron)] hover:bg-orange-500 text-white font-semibold py-2 px-5 rounded-full transition duration-150 ease-in-out shadow hover:shadow-md">
+                                 {{ uiStrings.viewDetails }}
+                             </button>
+                         </div>
+                    </div>
+                </div>
+            </section>
+
+             <section class="py-10 px-4 md:px-8">
+                <div class="container mx-auto">
+                    <h2 class="text-2xl md:text-3xl font-semibold text-center mb-6">{{ uiStrings.categoriesTitle }}</h2>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3 md:gap-4">
+                        <div v-for="category in categories" :key="category.key"
+                             class="category-card"
+                             @click="filterByCategory(category.key)"> {{ category.name[currentLanguage] }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="py-12 px-4 md:px-8">
+                <div class="container mx-auto">
+                    <h2 class="text-2xl md:text-3xl font-semibold text-center mb-2">{{ uiStrings.productsTitle }}</h2>
+                    <p v-if="currentFilter" class="text-center text-gray-600 mb-6">{{ uiStrings.showingCategory }}: <span class="font-semibold">{{ getCategoryName(currentFilter) }}</span> <button @click="clearFilter" class="text-sm text-blue-600 hover:underline ml-2">({{ uiStrings.showAll }})</button></p>
+                    <div class="carousel-container">
+                        <div class="carousel" ref="carouselElement">
+                            <div v-for="product in filteredProducts" :key="product.id"
+                                 @click="openModal('product', product)"
+                                 class="carousel-item bg-white rounded-lg shadow-md overflow-hidden cursor-pointer border border-[var(--border-color)] flex flex-col">
+                                <img :src="product.imageUrl" :alt="product.name[currentLanguage]"
+                                     class="w-full h-32 object-cover bg-gray-200"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/180x130/e0e0e0/777?text=Producto';">
+                                <div class="p-3 flex flex-col flex-grow">
+                                    <h3 class="text-sm font-semibold text-gray-800 mb-1 truncate">{{ product.name[currentLanguage] }}</h3>
+                                    <p class="text-xs text-gray-600 flex-grow">{{ product.shortDesc[currentLanguage] }}</p>
+                                </div>
+                            </div>
+                             <div v-if="filteredProducts.length === 0 && products.length > 0" class="w-full text-center py-10 text-gray-500">
+                                {{ uiStrings.noProductsInCategory }} "{{ getCategoryName(currentFilter) }}".
+                            </div>
+                        </div>
+                        <button @click="scrollCarousel(-1)" class="carousel-btn prev" aria-label="Previous Product">❮</button>
+                        <button @click="scrollCarousel(1)" class="carousel-btn next" aria-label="Next Product">❯</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dishes-section py-10 px-4 md:px-8">
+                <div class="container mx-auto">
+                    <h3 class="text-xl md:text-2xl font-semibold text-center mb-3">{{ uiStrings.typicalDishesTitle }}</h3>
+                    <p class="text-sm text-gray-600 text-center mb-6 max-w-xl mx-auto">{{ uiStrings.typicalDishesDesc }}</p>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 md:gap-5">
+                        <div v-for="dish in typicalDishes" :key="dish.id" class="dish-card-small">
+                            <img :src="dish.imageUrl" :alt="dish.name[currentLanguage]" >
+                            <div class="dish-name-small">{{ dish.name[currentLanguage] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="footer p-6 mt-12">
+            <div class="container mx-auto text-center">
+                <div class="mb-4">
+                    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-square"></i></a>
+                    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram-square"></i></a>
+                    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp-square"></i></a>
+                </div>
+                <div class="mb-4 text-sm">
+                    <span>{{ uiStrings.cardsAccepted }}: </span>
+                    <i class="fab fa-cc-visa"></i> <i class="fab fa-cc-mastercard"></i> <i class="fab fa-cc-discover"></i>
+                    <span class="payment-icon mercado-pago">Mercado Pago</span>
+                </div>
+                <div class="text-xs mb-2"> Masala Mandir © {{ new Date().getFullYear() }} - {{ uiStrings.locationAguascalientes }} </div>
+                <div class="text-xs text-gray-600"> {{ uiStrings.designedBy }} </div>
+            </div>
+        </footer>
+
+
+        <transition name="fade">
+            <div v-if="activeModal"
+                 class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 overflow-y-auto"
+                 @click.self="closeModal">
+                <transition name="scale">
+                    <div v-if="activeModal" class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] relative flex flex-col">
+                        <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)]">
+                            <h3 class="text-xl font-semibold text-[var(--primary-green)]">{{ modalTitle }}</h3>
+                            <button @click="closeModal" class="text-gray-500 hover:text-gray-800 text-2xl leading-none" aria-label="Cerrar">×</button>
+                        </div>
+                        <div class="p-6 overflow-y-auto flex-grow">
+                            <div v-if="activeModal === 'about'">
+                                <p class="mb-4">{{ uiStrings.aboutContent1 }}</p>
+                                <p>{{ uiStrings.aboutContent2 }}</p>
+                            </div>
+                            <div v-if="activeModal === 'location'" class="space-y-4">
+                                <p>{{ uiStrings.locationText }}</p>
+                                <div class="aspect-w-16 aspect-h-9 border border-[var(--border-color)] rounded">
+                                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d118484.0122976844!2d-102.36600164335938!3d21.858043100000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8429ee1c8b595183%3A0x638ef44f1467507e!2sAguascalientes%2C%20Ags.!5e0!3m2!1ses-419!2smx!4v1713924012345!5m2!1ses-419!2smx" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa de Ubicación"></iframe>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                     <img src="https://placehold.co/300x200/f0e0d0/555?text=Tienda+Exterior" alt="Exterior de la tienda" class="rounded shadow">
+                                     <img src="https://placehold.co/300x200/d0f0e0/555?text=Tienda+Interior" alt="Interior de la tienda" class="rounded shadow">
+                                </div>
+                            </div>
+                            <div v-if="activeModal === 'product' && selectedProduct" class="flex flex-col md:flex-row gap-6">
+                                <img :src="selectedProduct.imageUrl" :alt="selectedProduct.name[currentLanguage]"
+                                     class="w-full md:w-1/2 h-64 object-cover bg-gray-200 rounded-lg border border-[var(--border-color)]"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/300x300/e0e0e0/777?text=Producto';">
+                                <div class="md:w-1/2">
+                                    <h4 class="text-lg font-semibold mb-1">{{ selectedProduct.name[currentLanguage] }}</h4>
+                                    <p class="text-sm text-gray-500 mb-3">{{ uiStrings.category }}: {{ selectedProduct.category[currentLanguage] }}</p>
+                                    <p class="text-sm text-gray-700 leading-relaxed">{{ selectedProduct.longDesc[currentLanguage] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="p-4 border-t border-[var(--border-color)] text-right">
+                             <button @click="closeModal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition duration-150 ease-in-out">
+                                {{ uiStrings.close }}
+                             </button>
+                         </div>
+                    </div>
+                 </transition>
+            </div>
+        </transition>
+
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                // --- Reactive State ---
+                const currentLanguage = ref('es');
+                const activeModal = ref(null);
+                const selectedProduct = ref(null);
+                const carouselElement = ref(null);
+                const currentFilter = ref(null); // To store the selected category key
+
+                // --- Static Data ---
+                const categories = [
+                    { key: 'Spices', name: { es: 'Especias', en: 'Spices' } },
+                    { key: 'LentilsDals', name: { es: 'Lentejas/Dals', en: 'Lentils/Dals' } },
+                    { key: 'RiceFlour', name: { es: 'Arroz/Harina', en: 'Rice/Flour' } },
+                    { key: 'SnacksSweets', name: { es: 'Snacks/Dulces', en: 'Snacks/Sweets' } },
+                    { key: 'TeaCoffee', name: { es: 'Té/Café', en: 'Tea/Coffee' } },
+                    { key: 'PicklesChutneys', name: { es: 'Encurtidos', en: 'Pickles/Chutneys' } },
+                    { key: 'ReadyToEat', name: { es: 'Listo Para Comer', en: 'Ready To Eat' } },
+                    { key: 'PersonalCare', name: { es: 'Cuidado Personal', en: 'Personal Care' } },
+                ];
+
+                // --- Language Strings ---
+                const translations = {
+                    es: {
+                        aboutUs: "Quiénes Somos", location: "Ubicación",
+                        heroTitle: "¡El Sabor Auténtico de la India en Aguascalientes!",
+                        heroSubtitle: "Descubre la más amplia variedad de especias, legumbres, arroces y productos importados directamente de la India.",
+                        featuredProductTitle: "Producto del Mes", // New Title
+                        viewDetails: "Ver Detalles", // New Button Text
+                        categoriesTitle: "Explora por Categoría", // New Title
+                        productsTitle: "Nuestros Productos",
+                        showingCategory: "Mostrando categoría", // Filter status
+                        showAll: "Mostrar Todo", // Clear filter text
+                        noProductsInCategory: "No hay productos en la categoría", // No results message
+                        typicalDishesTitle: "Inspiración Culinaria India",
+                        typicalDishesDesc: "Estos son algunos ejemplos de deliciosos platillos que puedes preparar con nuestros ingredientes. ¡No vendemos comida preparada!",
+                        cardsAccepted: "Aceptamos", locationAguascalientes: "Aguascalientes, México", designedBy: "Diseñado por IA",
+                        aboutContent1: "Masala Mandir nació de la pasión por compartir los sabores ricos y diversos de la cocina india con la comunidad de Aguascalientes. Somos una tienda familiar dedicada a ofrecer productos auténticos y de alta calidad.",
+                        aboutContent2: "Desde especias exóticas y arroces aromáticos hasta snacks deliciosos y tés reconfortantes, encontrarás todo lo necesario para preparar tus platillos indios favoritos o explorar nuevos sabores. ¡Visítanos!",
+                        locationText: "Encuéntranos en el corazón de Aguascalientes. ¡Te esperamos!",
+                        close: "Cerrar", category: "Categoría",
+                        // Category names already in categories array
+                        ButterChicken: "Pollo Mantequilla", Samosa: "Samosa", PalakPaneer: "Palak Paneer", ChanaMasala: "Chana Masala", AlooGobi: "Aloo Gobi", TandooriChicken: "Pollo Tandoori", Biryani: "Biryani", Naan: "Naan", DalMakhani: "Dal Makhani", GulabJamun: "Gulab Jamun",
+                    },
+                    en: {
+                        aboutUs: "Who We Are", location: "Location",
+                        heroTitle: "The Authentic Taste of India in Aguascalientes!",
+                        heroSubtitle: "Discover the widest variety of spices, legumes, rice, and products imported directly from India.",
+                        featuredProductTitle: "Product of the Month", // New Title
+                        viewDetails: "View Details", // New Button Text
+                        categoriesTitle: "Browse by Category", // New Title
+                        productsTitle: "Our Products",
+                        showingCategory: "Showing category", // Filter status
+                        showAll: "Show All", // Clear filter text
+                        noProductsInCategory: "No products found in category", // No results message
+                        typicalDishesTitle: "Indian Culinary Inspiration",
+                        typicalDishesDesc: "These are some examples of delicious dishes you can prepare with our ingredients. We do not sell prepared food!",
+                        cardsAccepted: "We Accept", locationAguascalientes: "Aguascalientes, Mexico", designedBy: "Designed by AI",
+                        aboutContent1: "Masala Mandir was born from a passion for sharing the rich and diverse flavors of Indian cuisine with the Aguascalientes community. We are a family-run store dedicated to offering authentic, high-quality products.",
+                        aboutContent2: "From exotic spices and aromatic rice to delicious snacks and comforting teas, you'll find everything you need to prepare your favorite Indian dishes or explore new flavors. Visit us!",
+                        locationText: "Find us in the heart of Aguascalientes. We look forward to seeing you!",
+                        close: "Close", category: "Category",
+                        // Category names already in categories array
+                        ButterChicken: "Butter Chicken", Samosa: "Samosa", PalakPaneer: "Palak Paneer", ChanaMasala: "Chana Masala", AlooGobi: "Aloo Gobi", TandooriChicken: "Tandoori Chicken", Biryani: "Biryani", Naan: "Naan", DalMakhani: "Dal Makhani", GulabJamun: "Gulab Jamun",
+                    }
+                };
+
+                // --- Computed UI Strings ---
+                const uiStrings = computed(() => translations[currentLanguage.value]);
+
+                // --- Sample Product Data ---
+                const generateProducts = (count) => {
+                    const items = [];
+                    const categoryKeys = categories.map(c => c.key); // Get keys from static data
+                    const baseNames = ['Masala', 'Dal', 'Basmati', 'Samosa Mix', 'Chai', 'Achaar', 'Paneer Mix', 'Haldi', 'Jeera', 'Garam', 'Chana', 'Moong', 'Atta', 'Namkeen', 'Gulab Jamun Mix', 'Mango Lassi Mix', 'Turmeric Soap', 'Coconut Oil'];
+                    for (let i = 1; i <= count; i++) {
+                        const categoryKey = categoryKeys[i % categoryKeys.length];
+                        const baseName = baseNames[i % baseNames.length];
+                        const name_es = `${baseName} ${categoryKey} #${i}`;
+                        const name_en = `${baseName} ${categoryKey} #${i}`;
+                        const shortDesc_es = `Delicioso ${baseName} tradicional.`;
+                        const shortDesc_en = `Delicious traditional ${baseName}.`;
+                        const longDesc_es = `Descripción detallada de ${name_es}. Ingredientes frescos y auténticos para tu cocina. Perfecto para diversas recetas.`;
+                        const longDesc_en = `Detailed description for ${name_en}. Fresh and authentic ingredients for your kitchen. Perfect for various recipes.`;
+                        items.push({
+                            id: i,
+                            name: { es: name_es, en: name_en },
+                            categoryKey: categoryKey, // Store the key for filtering
+                            category: { // Store translated names
+                                es: categories.find(c=>c.key === categoryKey)?.name.es || categoryKey,
+                                en: categories.find(c=>c.key === categoryKey)?.name.en || categoryKey
+                            },
+                            shortDesc: { es: shortDesc_es, en: shortDesc_en },
+                            longDesc: { es: longDesc_es, en: longDesc_en },
+                            imageUrl: `https://placehold.co/180x130/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=${encodeURIComponent(baseName)}`
+                        });
+                    } return items;
+                 };
+                const products = ref(generateProducts(50));
+
+                // --- Featured Product Data (Example: Chai) ---
+                 const featuredProduct = ref({
+                     name: { es: "Auténtico Té Masala Chai", en: "Authentic Masala Chai Tea" },
+                     description: {
+                         es: "Disfruta de la mezcla perfecta de té negro robusto y especias aromáticas como cardamomo, clavo y canela. Prepara una taza reconfortante y energizante en minutos. ¡El verdadero sabor de la India!",
+                         en: "Enjoy the perfect blend of robust black tea and aromatic spices like cardamom, cloves, and cinnamon. Prepare a comforting and energizing cup in minutes. The true taste of India!"
+                     },
+                     imageUrl: `https://placehold.co/400x300/d8a77f/603813?text=Masala+Chai`,
+                     // Link to the actual product data if it exists in the main list
+                     productData: products.value.find(p => p.categoryKey === 'TeaCoffee' && p.name.en.includes('Chai')) || products.value[4] // Fallback to product #5
+                 });
+
+
+                 // --- Typical Dishes Data ---
+                 const typicalDishes = ref([
+                    { id: 'd1', nameKey: 'ButterChicken', imageUrl: 'https://placehold.co/200x150/ffcccb/8B4513?text=Butter+Chicken' },
+                    { id: 'd2', nameKey: 'Samosa', imageUrl: 'https://placehold.co/200x150/f5deb3/8B4513?text=Samosa' },
+                    { id: 'd3', nameKey: 'PalakPaneer', imageUrl: 'https://placehold.co/200x150/90ee90/228B22?text=Palak+Paneer' },
+                    { id: 'd4', nameKey: 'ChanaMasala', imageUrl: 'https://placehold.co/200x150/ffe4b5/A0522D?text=Chana+Masala' },
+                    { id: 'd5', nameKey: 'AlooGobi', imageUrl: 'https://placehold.co/200x150/fffacd/DAA520?text=Aloo+Gobi' },
+                    { id: 'd6', nameKey: 'TandooriChicken', imageUrl: 'https://placehold.co/200x150/ff7f50/dc143c?text=Tandoori+Chicken' },
+                    { id: 'd7', nameKey: 'Biryani', imageUrl: 'https://placehold.co/200x150/fff8dc/b8860b?text=Biryani' },
+                    { id: 'd8', nameKey: 'Naan', imageUrl: 'https://placehold.co/200x150/fff5ee/d2b48c?text=Naan' },
+                    { id: 'd9', nameKey: 'DalMakhani', imageUrl: 'https://placehold.co/200x150/f5f5dc/800000?text=Dal+Makhani' },
+                    { id: 'd10', nameKey: 'GulabJamun', imageUrl: 'https://placehold.co/200x150/ffd700/8b4513?text=Gulab+Jamun' },
+                 ].map(dish => ({
+                     ...dish,
+                     name: {
+                         es: translations.es[dish.nameKey] || dish.nameKey,
+                         en: translations.en[dish.nameKey] || dish.nameKey
+                     }
+                 })));
+
+                // --- Computed Properties ---
+                const modalTitle = computed(() => { /* ... (logic remains the same) ... */
+                    switch (activeModal.value) {
+                        case 'about': return uiStrings.value.aboutUs;
+                        case 'location': return uiStrings.value.location;
+                        case 'product': return selectedProduct.value?.name[currentLanguage.value] || 'Product Detail';
+                        default: return '';
+                    }
+                 });
+
+                // Filter products based on currentFilter
+                const filteredProducts = computed(() => {
+                    if (!currentFilter.value) {
+                        return products.value; // Show all if no filter
+                    }
+                    return products.value.filter(p => p.categoryKey === currentFilter.value);
+                });
+
+                // --- Methods ---
+                const toggleLanguage = () => { currentLanguage.value = currentLanguage.value === 'es' ? 'en' : 'es'; };
+                const openModal = (modalType, data = null) => { /* ... (logic remains the same) ... */
+                    activeModal.value = modalType;
+                    if (modalType === 'product' && data) { selectedProduct.value = data; }
+                    document.body.style.overflow = 'hidden';
+                 };
+                const closeModal = () => { /* ... (logic remains the same) ... */
+                    activeModal.value = null;
+                    selectedProduct.value = null;
+                    document.body.style.overflow = '';
+                 };
+                const scrollCarousel = (direction) => { /* ... (logic remains the same) ... */
+                    if (carouselElement.value) {
+                        const scrollAmount = carouselElement.value.offsetWidth * 0.8 * direction;
+                        carouselElement.value.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                    }
+                 };
+
+                 // Method to set the category filter
+                 const filterByCategory = (categoryKey) => {
+                     currentFilter.value = categoryKey;
+                     console.log("Filtering by:", categoryKey);
+                     // Optional: Scroll to product section?
+                 };
+
+                 // Method to clear the filter
+                 const clearFilter = () => {
+                     currentFilter.value = null;
+                 };
+
+                 // Method to get category name for display
+                 const getCategoryName = (key) => {
+                     const category = categories.find(c => c.key === key);
+                     return category ? category.name[currentLanguage.value] : key;
+                 };
+
+
+                // --- Expose to Template ---
+                return {
+                    currentLanguage, activeModal, selectedProduct, products, typicalDishes, categories, // Added categories
+                    featuredProduct, // Added featured product
+                    currentFilter, // Added filter state
+                    uiStrings, modalTitle, carouselElement,
+                    filteredProducts, // Use filtered list in template
+                    toggleLanguage, openModal, closeModal, scrollCarousel,
+                    filterByCategory, clearFilter, getCategoryName // Added filter methods
+                };
+            }
+        }).mount('#app');
+    </script>
+
+</body>
+</html>
